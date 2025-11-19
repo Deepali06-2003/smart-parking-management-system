@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard & Analytics - Smart Parking System{% endblock %}
+
+{% block content %}
+<div class="dashboard-header text-center py-4 mb-5">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-3">Dashboard & Analytics</h1>
+        <p class="lead text-dark">Real-time parking predictions and historical analysis</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-search me-2"></i>Parking Prediction
+                    </h5>
+                    <form id="parkingForm" class="mb-4">
+                        <div class="mb-4">
+                            <label for="hour" class="form-label">
+                                <i class="fas fa-clock me-2"></i>Hour of Day (0-23)
+                            </label>
+                            <input type="number" class="form-control" id="hour" min="0" max="23" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="day" class="form-label">
+                                <i class="fas fa-calendar me-2"></i>Day of Week
+                            </label>
+                            <select class="form-select" id="day" required>
+                                <option value="0">Monday</option>
+                                <option value="1">Tuesday</option>
+                                <option value="2">Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                                <option value="6">Sunday</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-calculator me-2"></i>Get Prediction
+                        </button>
+                    </form>
+                    <div id="predictionResults" class="prediction-results">
+                        <p class="text-muted text-center">
+                            <i class="fas fa-info-circle me-2"></i>Enter your preferences to get parking predictions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-map me-2"></i>Zone Distribution
+                    </h5>
+                    <div class="chart-container mb-4">
+                        <canvas id="zoneChart"></canvas>
+                    </div>
+                    <div class="zone-legend-container">
+                        <h6 class="text-muted mb-3">
+                            <i class="fas fa-key me-2"></i>Zone Legend
+                        </h6>
+                        <div class="zone-legend">
+                            <div class="zone-item mb-3">
+                                <span class="zone-color" style="background-color: #FF9999"></span>
+                                <span>Zone 1: High Traffic</span>
+                            </div>
+                            <div class="zone-item mb-3">
+                                <span class="zone-color" style="background-color: #99FF99"></span>
+                                <span>Zone 2: Medium Traffic</span>
+                            </div>
+                            <div class="zone-item mb-3">
+                                <span class="zone-color" style="background-color: #9999FF"></span>
+                                <span>Zone 3: Low Traffic</span>
+                            </div>
+                            <div class="zone-item">
+                                <span class="zone-color" style="background-color: #FFFF99"></span>
+                                <span>Zone 4: Variable Traffic</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-line me-2"></i>Hourly Parking Trends
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-clock me-2"></i>Average Duration by Hour
+                    </h5>
+                    <div class="chart-container">
+                        <canvas id="durationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-table me-2"></i>Detailed Statistics
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th><i class="fas fa-clock me-2"></i>Hour</th>
+                                    <th><i class="fas fa-car me-2"></i>Total Parkings</th>
+                                    <th><i class="fas fa-hourglass-half me-2"></i>Average Duration</th>
+                                    <th><i class="fas fa-percentage me-2"></i>Occupancy Rate</th>
+                                    <th><i class="fas fa-map-marked-alt me-2"></i>Recommended Zone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="statsBody">
+                                <!-- Stats will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation classes to elements
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    });
+    
+    animateElements.forEach(element => {
+        observer.observe(element);
+    });
+
+    // Fetch and display stats
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            const stats = data.hourly_stats;
+            
+            // Update stats table
+            const statsBody = document.getElementById('statsBody');
+            statsBody.innerHTML = stats.map(stat => {
+                const occupancyRate = (stat.Slot_ID / 100) * 100;
+                const recommendedZone = Math.floor(Math.random() * 4);
+                const zoneColors = ['#FF9999', '#99FF99', '#9999FF', '#FFFF99'];
+                return `
+                    <tr>
+                        <td>${stat.hour}:00</td>
+                        <td>${stat.Slot_ID}</td>
+                        <td>${Math.round(stat.Duration_Minutes)} minutes</td>
+                        <td>${Math.round(occupancyRate)}%</td>
+                        <td>
+                            <span class="badge" style="background-color: ${zoneColors[recommendedZone]}">
+                                Zone ${recommendedZone + 1}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            // Create hourly parking chart
+            new Chart(document.getElementById('hourlyChart'), {
+                type: 'line',
+                data: {
+                    labels: stats.map(stat => `${stat.hour}:00`),
+                    datasets: [{
+                        label: 'Number of Parkings',
+                        data: stats.map(stat => stat.Slot_ID),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: true,
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Create duration chart
+            new Chart(document.getElementById('durationChart'), {
+                type: 'bar',
+                data: {
+                    labels: stats.map(stat => `${stat.hour}:00`),
+                    datasets: [{
+                        label: 'Average Duration (minutes)',
+                        data: stats.map(stat => Math.round(stat.Duration_Minutes)),
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Create zone distribution chart
+            new Chart(document.getElementById('zoneChart'), {
+                type: 'pie',
+                data: {
+                    labels: ['Zone 1', 'Zone 2', 'Zone 3', 'Zone 4'],
+                    datasets: [{
+                        data: [25, 25, 25, 25],
+                        backgroundColor: ['#FF9999', '#99FF99', '#9999FF', '#FFFF99']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        });
+    
+    // Handle prediction form submission
+    document.getElementById('parkingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const hour = document.getElementById('hour').value;
+        const day = document.getElementById('day').value;
+        
+        fetch('/api/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ hour, day_of_week: day })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultsDiv = document.getElementById('predictionResults');
+            const zoneColors = ['#FF9999', '#99FF99', '#9999FF', '#FFFF99'];
+            
+            resultsDiv.innerHTML = `
+                <div class="alert alert-info mb-3">
+                    <h6><i class="fas fa-chart-line me-2"></i>Predicted Occupancy</h6>
+                    <p class="mb-0">${Math.round(data.predicted_occupancy)} minutes average stay</p>
+                </div>
+                <div class="alert" style="background-color: ${zoneColors[data.recommended_zone]}">
+                    <h6><i class="fas fa-map-marker-alt me-2"></i>Recommended Zone</h6>
+                    <p class="mb-0">Zone ${data.recommended_zone + 1}</p>
+                    <p class="mb-0">This zone typically has optimal availability during your selected time.</p>
+                </div>
+            `;
+        });
+    });
+});
+</script>
+{% endblock %} 

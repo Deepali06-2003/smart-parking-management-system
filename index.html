@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Smart Parking System{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5 mb-5">
+    <div class="container">
+        <h1 class="display-5 fw-bold mb-4">Welcome to Smart Parking System</h1>
+        <p class="lead text-dark mb-5">Intelligent Parking Management Powered by Machine Learning</p>
+        <a href="/dashboard" class="btn btn-primary btn-lg text-white">
+            <i class="fas fa-arrow-right me-2"></i>Get Started
+        </a>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-brain me-2 text-primary"></i>System Overview
+                    </h5>
+                    <p class="text-dark mb-4">Our Smart Parking System uses advanced machine learning algorithms to:</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item py-3">
+                            <i class="fas fa-chart-line me-2 text-primary"></i>Predict parking availability in real-time
+                        </li>
+                        <li class="list-group-item py-3">
+                            <i class="fas fa-chart-bar me-2 text-primary"></i>Analyze parking patterns and trends
+                        </li>
+                        <li class="list-group-item py-3">
+                            <i class="fas fa-optimize me-2 text-primary"></i>Optimize parking space utilization
+                        </li>
+                        <li class="list-group-item py-3">
+                            <i class="fas fa-lightbulb me-2 text-primary"></i>Provide data-driven recommendations
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100 animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-chart-pie me-2 text-primary"></i>Live System Status
+                    </h5>
+                    <div id="liveStats" class="text-center mb-4">
+                        <p class="text-dark">Loading statistics...</p>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="currentStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-book me-2 text-primary"></i>Key Terminology
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="terminology-item mb-4">
+                                <h6 class="mb-2 text-dark"><i class="fas fa-parking me-2 text-primary"></i>Parking Slot</h6>
+                                <p class="mb-0 text-dark">A designated space for a single vehicle, identified by a unique Slot_ID (e.g., P0163)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="terminology-item mb-4">
+                                <h6 class="mb-2 text-dark"><i class="fas fa-percentage me-2 text-primary"></i>Occupancy Rate</h6>
+                                <p class="mb-0 text-dark">The percentage of parking slots currently in use at any given time</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="terminology-item mb-4">
+                                <h6 class="mb-2 text-dark"><i class="fas fa-clock me-2 text-primary"></i>Duration</h6>
+                                <p class="mb-0 text-dark">The length of time a vehicle occupies a parking slot, measured in minutes</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="terminology-item">
+                                <h6 class="mb-2 text-dark"><i class="fas fa-map-marked-alt me-2 text-primary"></i>Parking Zone</h6>
+                                <p class="mb-0 text-dark">A group of parking slots with similar usage patterns, identified by color coding</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card animate-on-scroll">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-rocket me-2 text-primary"></i>Quick Start Guide
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="text-center p-3">
+                                <div class="guide-icon mb-3">
+                                    <i class="fas fa-chart-line fa-2x text-primary"></i>
+                                </div>
+                                <h6 class="text-dark">Visit Dashboard</h6>
+                                <p class="text-dark small">Access real-time analytics and predictions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3">
+                                <div class="guide-icon mb-3">
+                                    <i class="fas fa-search fa-2x text-primary"></i>
+                                </div>
+                                <h6 class="text-dark">View Predictions</h6>
+                                <p class="text-dark small">Get parking availability forecasts</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3">
+                                <div class="guide-icon mb-3">
+                                    <i class="fas fa-history fa-2x text-primary"></i>
+                                </div>
+                                <h6 class="text-dark">Analyze Trends</h6>
+                                <p class="text-dark small">Study historical parking patterns</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3">
+                                <div class="guide-icon mb-3">
+                                    <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
+                                </div>
+                                <h6 class="text-dark">Get Recommendations</h6>
+                                <p class="text-dark small">Find optimal parking locations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add animation classes to elements
+    const animateElements = document.querySelectorAll('.animate-on-scroll');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    });
+    
+    animateElements.forEach(element => {
+        observer.observe(element);
+    });
+
+    // Fetch and display stats
+    fetch('/api/stats')
+        .then(response => response.json())
+        .then(data => {
+            const stats = data.hourly_stats;
+            const currentHour = new Date().getHours();
+            const currentStats = stats.find(stat => stat.hour === currentHour);
+            
+            // Update live stats
+            const statsDiv = document.getElementById('liveStats');
+            if (currentStats) {
+                const occupancyRate = (currentStats.Slot_ID / 100) * 100;
+                statsDiv.innerHTML = `
+                    <h3 class="text-primary">Current Status (${currentHour}:00)</h3>
+                    <p class="lead">
+                        <i class="fas fa-car me-2"></i>Occupancy Rate: ${Math.round(occupancyRate)}%
+                    </p>
+                    <p class="lead">
+                        <i class="fas fa-clock me-2"></i>Average Duration: ${Math.round(currentStats.Duration_Minutes)} minutes
+                    </p>
+                `;
+            }
+            
+            // Create current status chart
+            new Chart(document.getElementById('currentStatusChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Occupied', 'Available'],
+                    datasets: [{
+                        data: [currentStats.Slot_ID, 100 - currentStats.Slot_ID],
+                        backgroundColor: ['#ff6384', '#36a2eb']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+});
+</script>
+{% endblock %} 
